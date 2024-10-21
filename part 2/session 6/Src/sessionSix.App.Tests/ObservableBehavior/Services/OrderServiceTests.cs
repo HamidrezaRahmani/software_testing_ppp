@@ -64,7 +64,6 @@ public class OrderServiceTests
         Assert.Equal(discount, actual.Discount);
         Assert.Equal(customer, actual.Customer);
         Assert.Equal(1, actual.Products.Count);
-        actual.Should().ContainEquivalentOf()
         
     }
     
