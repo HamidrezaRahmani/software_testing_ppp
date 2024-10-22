@@ -18,10 +18,7 @@ public class OrdersControllerTests
     }
     
     [Theory]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(7)]
-    [Fact]
+    [InlineData("5")]
     public void Order_is_created_successfully(string id)
     {
         //Arrange
@@ -36,11 +33,8 @@ public class OrdersControllerTests
         Assert.Equal(id, result); 
     }
 
+    [InlineData("5")]
     [Theory]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(7)]
-    [Fact]
     public void Order_is_modified_successfully(string id)
     {
         //Arrange

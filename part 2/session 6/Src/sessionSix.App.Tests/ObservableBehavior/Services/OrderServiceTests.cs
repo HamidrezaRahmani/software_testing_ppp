@@ -63,13 +63,44 @@ public class OrderServiceTests
         Assert.Equal(store, actual.Store);
         Assert.Equal(discount, actual.Discount);
         Assert.Equal(customer, actual.Customer);
-        Assert.Equal(1, actual.Products.Count);
+        actual.Products.Should().ContainEquivalentOf(product);
         
     }
     
     [Fact]
     public void Order_is_modified_successfully()
     {
-        
+        var request = new ModifyOrderRequest
+        {
+            Id = "order123",
+            CustomerId = "cust1",
+            StoreId = "store1",
+            DiscountCode = "DISC10",
+            Products = new List<ProductRequestItem> { new ProductRequestItem { Id = "prod1" } }
+        };
+
+        var existingOrder = new Order { Id = "order123" };
+        var customer = new Customer { Id = "cust1", IsActive = true };
+        var store = new Store { Id = "store1", IsActive = true };
+        var discount = new Discount { Code = "DISC10", IsActive = true };
+        var product = new Product { Id = "prod1", Price = 100 };
+
+        _orderRepository.GetBy(request.Id).Returns(existingOrder);
+        _customerRepository.GetBy(request.CustomerId).Returns(customer);
+        _storeRepository.GetBy(request.StoreId).Returns(store);
+        _discountRepository.GetBy(request.DiscountCode).Returns(discount);
+        _productRepository.GetBy("prod1").Returns(product);
+
+        // Act
+        var result = _sut.UpdateOrder(request);
+
+        // Assert (using FluentAssertions)
+        result.Should().NotBeNull();
+        result.Id.Should().Be("order123");
+        result.Store.Should().Be(store);
+        result.Discount.Should().Be(discount);
+        result.Customer.Should().Be(customer);
+        result.Products.Should().ContainEquivalentOf(product);
+
     }
 }
