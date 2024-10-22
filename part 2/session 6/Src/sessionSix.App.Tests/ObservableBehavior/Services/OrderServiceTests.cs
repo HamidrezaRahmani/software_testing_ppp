@@ -33,74 +33,96 @@ public class OrderServiceTests
             _orderRepository);
     }
     
-    
-    [Fact]
-    public void Order_is_created_successfully()
+    [Theory]
+    [MemberData(nameof(GetCreateTestData))]
+    public void Order_is_created_successfully(string orderId, string customerId, string storeId, string discountCode, string productId, int productPrice, bool customerIsActive, bool storeIsActive, bool discountIsActive)
     {
-        var request = new ModifyOrderRequest
+        // Arrange
+        var request = new CreateOrderRequest
         {
-            Id = "order123",
-            CustomerId = "cust1",
-            StoreId = "store1",
-            DiscountCode = "DISC10",
-            Products = new List<ProductRequestItem> { new ProductRequestItem { Id = "prod1" } }
+            Id = orderId,
+            CustomerId = customerId,
+            StoreId = storeId,
+            DiscountCode = discountCode,
+            Products = new List<ProductRequestItem> { new ProductRequestItem { Id = productId } }
         };
-        
-        var customer = new Customer { Id = "cust1", IsActive = true };
-        var store = new Store { Id = "store1", IsActive = true };
-        var discount = new Discount { Code = "DISC10", IsActive = true };
-        var product = new Product { Id = "prod1", Price = 100 };
 
-        _customerRepository.GetBy(request.CustomerId).Returns(customer);
-        _storeRepository.GetBy(request.StoreId).Returns(store);
-        _discountRepository.GetBy(request.DiscountCode).Returns(discount);
-        _productRepository.GetBy("prod1").Returns(product);
-        //act
+        var customer = new Customer { Id = customerId, IsActive = customerIsActive };
+        var store = new Store { Id = storeId, IsActive = storeIsActive };
+        var discount = new Discount { Code = discountCode, IsActive = discountIsActive };
+        var product = new Product { Id = productId, Price = productPrice };
+
+        _customerRepository.GetBy(customerId).Returns(customer);
+        _storeRepository.GetBy(storeId).Returns(store);
+        _discountRepository.GetBy(discountCode).Returns(discount);
+        _productRepository.GetBy(productId).Returns(product);
+        
+        // Act
         var actual = _sut.CreateOrder(request);
         
-        //Assert
-        Assert.Equal("order123", actual.Id);
-        Assert.Equal(store, actual.Store);
-        Assert.Equal(discount, actual.Discount);
-        Assert.Equal(customer, actual.Customer);
+        // Assert
+        actual.Id.Should().Be(orderId);
+        actual.Store.Should().Be(store);
+        actual.Discount.Should().Be(discount);
+        actual.Customer.Should().Be(customer);
         actual.Products.Should().ContainEquivalentOf(product);
-        
     }
     
-    [Fact]
-    public void Order_is_modified_successfully()
+    
+    
+    [Theory]
+    [MemberData(nameof(GetUpdateTestData))]
+    public void Order_is_modified_successfully(string orderId, string customerId, string storeId, string discountCode, string productId, int productPrice, bool customerIsActive, bool storeIsActive, bool discountIsActive)
     {
+        // Arrange
         var request = new ModifyOrderRequest
         {
-            Id = "order123",
-            CustomerId = "cust1",
-            StoreId = "store1",
-            DiscountCode = "DISC10",
-            Products = new List<ProductRequestItem> { new ProductRequestItem { Id = "prod1" } }
+            Id = orderId,
+            CustomerId = customerId,
+            StoreId = storeId,
+            DiscountCode = discountCode,
+            Products = new List<ProductRequestItem> { new ProductRequestItem { Id = productId } }
         };
 
-        var existingOrder = new Order { Id = "order123" };
-        var customer = new Customer { Id = "cust1", IsActive = true };
-        var store = new Store { Id = "store1", IsActive = true };
-        var discount = new Discount { Code = "DISC10", IsActive = true };
-        var product = new Product { Id = "prod1", Price = 100 };
+        var existingOrder = new Order { Id = orderId };
+        var customer = new Customer { Id = customerId, IsActive = customerIsActive };
+        var store = new Store { Id = storeId, IsActive = storeIsActive };
+        var discount = new Discount { Code = discountCode, IsActive = discountIsActive };
+        var product = new Product { Id = productId, Price = productPrice };
 
         _orderRepository.GetBy(request.Id).Returns(existingOrder);
         _customerRepository.GetBy(request.CustomerId).Returns(customer);
         _storeRepository.GetBy(request.StoreId).Returns(store);
         _discountRepository.GetBy(request.DiscountCode).Returns(discount);
-        _productRepository.GetBy("prod1").Returns(product);
-
+        _productRepository.GetBy(productId).Returns(product);
+        
         // Act
-        var result = _sut.UpdateOrder(request);
+        var actual = _sut.UpdateOrder(request);
 
-        // Assert (using FluentAssertions)
-        result.Should().NotBeNull();
-        result.Id.Should().Be("order123");
-        result.Store.Should().Be(store);
-        result.Discount.Should().Be(discount);
-        result.Customer.Should().Be(customer);
-        result.Products.Should().ContainEquivalentOf(product);
-
+        // Assert 
+        actual.Id.Should().Be(orderId);
+        actual.Store.Should().Be(store);
+        actual.Discount.Should().Be(discount);
+        actual.Customer.Should().Be(customer);
+        actual.Products.Should().ContainEquivalentOf(product);
     }
+    
+    public static IEnumerable<object[]> GetUpdateTestData()
+    {
+        yield return new object[] { "order123", "cust1", "store1", "DISC10", "prod1", 100, true, true, true };
+        yield return new object[] { "order456", "cust2", "store2", "DISC20", "prod2", 200, true, true, true };
+        yield return new object[] { "order789", "cust3", "store3", "DISC30", "prod3", 150, true, true, true };
+        yield return new object[] { "order321", "cust4", "store4", "DISC40", "prod4", 250, true, true, true };
+        yield return new object[] { "order654", "cust5", "store5", "DISC50", "prod5", 300, true, true, true };
+    } 
+    
+    public static IEnumerable<object[]> GetCreateTestData()
+    {
+        yield return new object[] { "order123", "cust1", "store1", "DISC10", "prod1", 100, true, true, true };
+        yield return new object[] { "order456", "cust2", "store2", "DISC20", "prod2", 200, true, true, true };
+        yield return new object[] { "order789", "cust3", "store3", "DISC30", "prod3", 150, true, true, true };
+        yield return new object[] { "order321", "cust4", "store4", "DISC40", "prod4", 250, true, true, true };
+        yield return new object[] { "order654", "cust5", "store5", "DISC50", "prod5", 300, true, true, true };
+    }
+    
 }
