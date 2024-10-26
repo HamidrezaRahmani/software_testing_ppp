@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NSubstitute;
 using sessionSix.App.ObservableBehavior.Controllers;
 using sessionSix.App.ObservableBehavior.Domain;
@@ -29,10 +30,11 @@ public class OrdersControllerTests
         // Act
      
         _orderService.CreateOrder(request).Returns(response);
-        var result = _sut.CreateOrder(request);
+        var actual = _sut.CreateOrder(request);
         
         // Assert
-        Assert.Equal(id, result); 
+        actual.Should().Be(id);
+        
     }
     
     [Theory]
@@ -47,9 +49,9 @@ public class OrdersControllerTests
         // Act
      
         _orderService.UpdateOrder(request).Returns(response);
-        var result = _sut.UpdateOrder(request);
+        var actual = _sut.UpdateOrder(request);
         
         // Assert
-        Assert.Equal(id, result); 
+        actual.Should().Be(id);
     }
 }
