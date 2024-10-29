@@ -28,6 +28,8 @@ public class OrderTests
         actual.Customer.Should().Be(customer);
         actual.Products.Should().BeEquivalentTo(products);
     }
+    
+    
     public static IEnumerable<object[]> GetTestData()
     {
         yield return new object[] { "order123", "cust1", "store1", "DISC10", "prod1", 100, true, true, true };

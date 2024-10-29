@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NSubstitute;
 using sessionSix.App.ObservableBehavior.Controllers;
 using sessionSix.App.ObservableBehavior.Domain;
@@ -24,15 +25,21 @@ public class OrdersControllerTests
     public void Order_is_created_successfully(string id)
     {
         //Arrange
-        var request = new CreateOrderRequest() {  Id = id    }; 
+        var request = new CreateOrderRequest()
+        {
+            Id = id,
+            CustomerId = Guid.NewGuid().ToString(),
+            StoreId = Guid.NewGuid().ToString(),
+            DiscountCode = Guid.NewGuid().ToString(),
+        }; 
         var response = new Order() { Id = id }; 
         // Act
      
         _orderService.CreateOrder(request).Returns(response);
-        var result = _sut.CreateOrder(request);
+        var actual = _sut.CreateOrder(request);
         
         // Assert
-        Assert.Equal(id, result); 
+        actual.Should().Be(request.Id);
     }
     
     [Theory]
@@ -42,14 +49,20 @@ public class OrdersControllerTests
     public void Order_is_modified_successfully(string id)
     {
         //Arrange
-        var request = new ModifyOrderRequest() {  Id = id   }; 
+        var request = new ModifyOrderRequest()
+        {
+            Id = id,
+            CustomerId = Guid.NewGuid().ToString(),
+            StoreId = Guid.NewGuid().ToString(),
+            DiscountCode = Guid.NewGuid().ToString(),
+        }; 
         var response = new Order() { Id = id }; 
         // Act
      
         _orderService.UpdateOrder(request).Returns(response);
-        var result = _sut.UpdateOrder(request);
+        var actual = _sut.UpdateOrder(request);
         
         // Assert
-        Assert.Equal(id, result); 
+        actual.Should().Be(request.Id);
     }
 }
