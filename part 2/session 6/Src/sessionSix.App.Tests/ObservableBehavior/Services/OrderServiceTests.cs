@@ -76,6 +76,7 @@ public class OrderServiceTests
         
         // Assert
         actual.Should().BeEquivalentTo(expectedOrder);
+        _orderRepository.Received(1).Add(Arg.Any<Order>());
     }
     
     
@@ -123,6 +124,7 @@ public class OrderServiceTests
 
         // Assert 
         actual.Should().BeEquivalentTo(expectedOrder);
+        _orderRepository.Received(1).Add(Arg.Any<Order>());
     }
     
     
